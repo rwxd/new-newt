@@ -12,18 +12,7 @@ var deleteCmd = &cobra.Command{
 	Use:   "delete",
 	Short: "delete a domain from the check list",
 	Run: func(cmd *cobra.Command, args []string) {
-		config, err := utils.LoadConfig(".")
-		if err != nil {
-			log.Fatal("Cannot load config:", err)
-		}
-
-		redisClient := db.NewRedisClient(config.RedisHost)
-
-		if err != nil {
-			log.Fatal("Redis connection failed:", err)
-		}
-
-		domains, err := redisClient.GetDomainsToCheck()
+		domains, err := db.Rdb.GetDomainsToCheck()
 
 		if err != nil {
 			log.Fatal(err)
@@ -32,7 +21,7 @@ var deleteCmd = &cobra.Command{
 		for _, arg := range args {
 			if utils.StringInSlice(arg, domains) {
 				log.Printf("Removing \"%s\" from the list of domains to check\n", arg)
-				err = redisClient.DeleteDomainToCheck(arg)
+				err = db.Rdb.DeleteDomainToCheck(arg)
 				if err != nil {
 					log.Println("Error adding domain to list:", err)
 				}

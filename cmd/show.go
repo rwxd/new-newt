@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/rwxd/new-newt/db"
-	"github.com/rwxd/new-newt/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -18,18 +17,7 @@ var showDomainsCmd = &cobra.Command{
 	Use:   "domains",
 	Short: "show all domains that are being checked",
 	Run: func(cmd *cobra.Command, args []string) {
-		config, err := utils.LoadConfig(".")
-		if err != nil {
-			log.Fatal("Cannot load config:", err)
-		}
-
-		redisClient := db.NewRedisClient(config.RedisHost)
-
-		if err != nil {
-			log.Fatal("Redis connection failed:", err)
-		}
-
-		domains, err := redisClient.GetDomainsToCheck()
+		domains, err := db.Rdb.GetDomainsToCheck()
 		if err != nil {
 			log.Fatal(err)
 		}

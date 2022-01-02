@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/go-redis/redis/v8"
+	"github.com/rwxd/new-newt/utils"
 )
 
 var ctx = context.Background()
@@ -104,9 +105,14 @@ func (r RedisClient) GetDomainStatus(domain string) (status DomainStatus, err er
 	return
 }
 
-func NewRedisClient(host string) RedisClient {
+func NewRedisClient() RedisClient {
+	config, err := utils.LoadConfig(".")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	client := redis.NewClient(&redis.Options{
-		Addr:     host,
+		Addr:     config.RedisHost,
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
@@ -114,3 +120,5 @@ func NewRedisClient(host string) RedisClient {
 		connection: client,
 	}
 }
+
+var Rdb RedisClient = NewRedisClient()

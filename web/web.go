@@ -14,21 +14,14 @@ type Index struct {
 }
 
 func handlerIndex(w http.ResponseWriter, r *http.Request) {
-	config, err := utils.LoadConfig(".")
-	if err != nil {
-		log.Fatal(w, "Cannot load config:", err)
-		return
-	}
-
-	redisClient := db.NewRedisClient(config.RedisHost)
-	domains, err := redisClient.GetDomainsToCheck()
+	domains, err := db.Rdb.GetDomainsToCheck()
 	if err != nil {
 		log.Fatal(w, err)
 		return
 	}
 	index := Index{Domains: make(map[string]db.DomainStatus)}
 	for _, domain := range domains {
-		status, err := redisClient.GetDomainStatus(domain)
+		status, err := db.Rdb.GetDomainStatus(domain)
 		if err != nil {
 			log.Fatal(w, err)
 			continue
@@ -38,7 +31,7 @@ func handlerIndex(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Found %d domains to check\n", len(domains))
 
-	t, err := template.ParseFiles("./web/templates/index.html")
+	t, err := template.ParseFiles("./ui/templates/index.html")
 	if err != nil {
 		log.Println(err)
 	}

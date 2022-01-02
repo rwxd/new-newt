@@ -17,14 +17,6 @@ var webCmd = &cobra.Command{
 			log.Fatal("Cannot load config:", err)
 		}
 
-		if err != nil {
-			log.Fatal("Redis connection failed:", err)
-		}
-
-		if err != nil {
-			log.Fatal(err)
-		}
-
 		web.WebServer("8080", config)
 	},
 }

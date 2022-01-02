@@ -13,18 +13,7 @@ var addCmd = &cobra.Command{
 	Use:   "add",
 	Short: "add a domain to the check list",
 	Run: func(cmd *cobra.Command, args []string) {
-		config, err := utils.LoadConfig(".")
-		if err != nil {
-			log.Fatal("cannot load config:", err)
-		}
-
-		redisClient := db.NewRedisClient(config.RedisHost)
-
-		if err != nil {
-			log.Fatal("redis connection failed:", err)
-		}
-
-		domains, err := redisClient.GetDomainsToCheck()
+		domains, err := db.Rdb.GetDomainsToCheck()
 
 		if err != nil {
 			log.Fatal(err)
@@ -38,7 +27,7 @@ var addCmd = &cobra.Command{
 				}
 
 				log.Printf("Adding \"%s\" to the list of domains to check\n", arg)
-				err = redisClient.AddDomainToCheck(arg)
+				err = db.Rdb.AddDomainToCheck(arg)
 				if err != nil {
 					log.Println("error adding domain to list:", err)
 				}

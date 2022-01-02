@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/rwxd/new-newt/db"
-	"github.com/rwxd/new-newt/utils"
 	"github.com/rwxd/new-newt/whois"
 	"github.com/spf13/cobra"
 )
@@ -16,18 +15,7 @@ var crawlerCmd = &cobra.Command{
 	Short: "runs the crawler in an infinity loop",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Println("Starting the application...")
-		config, err := utils.LoadConfig(".")
-		if err != nil {
-			log.Fatal("cannot load config:", err)
-		}
-
 		whoisClient := whois.NewWhoisClient()
-		redisClient := db.NewRedisClient(config.RedisHost)
-
-		if err != nil {
-			log.Fatal("redis connection failed:", err)
-		}
-
 		var wg sync.WaitGroup
 		maxGoroutines := 1
 		guard := make(chan struct{}, maxGoroutines)
@@ -35,7 +23,7 @@ var crawlerCmd = &cobra.Command{
 		checkInterval := time.Minute * 60 * 24
 
 		for {
-			domains, err := redisClient.GetDomainsToCheck()
+			domains, err := db.Rdb.GetDomainsToCheck()
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -45,7 +33,7 @@ var crawlerCmd = &cobra.Command{
 				go func(domain string) {
 					defer wg.Done()
 
-					status, err := redisClient.GetDomainStatus(domain)
+					status, err := db.Rdb.GetDomainStatus(domain)
 					if err != nil {
 						log.Printf("Domain \"%s\" not found in database\n", domain)
 					} else {
@@ -67,11 +55,11 @@ var crawlerCmd = &cobra.Command{
 					if response.Available {
 						log.Printf("Domain %s is available\n", domain)
 						status := db.NewDomainStatus(true, time)
-						redisClient.SetDomainStatus(domain, status)
+						db.Rdb.SetDomainStatus(domain, status)
 					} else {
 						log.Printf("Domain %s is not available\n", domain)
 						status := db.NewDomainStatus(false, time)
-						redisClient.SetDomainStatus(domain, status)
+						db.Rdb.SetDomainStatus(domain, status)
 					}
 					<-guard // release guard
 				}(domain)
