@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/rwxd/new-newt/utils"
+	"github.com/rwxd/new-newt/whois"
 )
 
 var ctx = context.Background()
@@ -148,6 +150,21 @@ func (r RedisClient) RemoveDuplicateDomains() (err error) {
 			}
 
 		}
+	}
+	return
+}
+
+func (r RedisClient) RecheckDomainStatus(domain string) (status DomainStatus, err error) {
+	whoisClient := whois.NewWhoisClient()
+	response, err := whoisClient.Lookup(domain)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	status = NewDomainStatus(response.Available, time.Now())
+	err = r.SetDomainStatus(domain, status)
+	if err != nil {
+		return
 	}
 	return
 }

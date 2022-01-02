@@ -1,0 +1,25 @@
+{{template "base" .}} {{define "title"}}Home{{end}} {{define "body"}}
+<h2>Domains</h2>
+<table class="domain-list">
+  <tr>
+    <th>Domain</th>
+    <th>Available</th>
+    <th>Last Checked</th>
+    <th></th>
+  </tr>
+  {{ range $domain, $status := .Domains }}
+  <tr>
+    <td>{{ $domain }}</td>
+    {{ if $status.Available }}
+    <td class="true">available</td>
+    {{ else }}
+    <td class="false">not available</td>
+    {{ end }}
+    <td>{{ $status.LastSearched.Format "2006-01-02 15:04:05" }}</td>
+    <td>
+      <a class="no-decoration" href="/check/{{ $domain }}">↻ check again</a>
+    </td>
+  </tr>
+  {{ end }}
+</table>
+{{end}}

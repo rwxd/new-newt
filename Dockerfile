@@ -1,5 +1,7 @@
 FROM golang:1.17-alpine as builder
 
+MAINTAINER rwxd <rwxd@pm.me> 
+
 WORKDIR /app
 
 COPY . .

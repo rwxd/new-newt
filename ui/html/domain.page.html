@@ -1,0 +1,12 @@
+{{template "base" .}} {{define "title"}}Home{{end}} {{define "body"}}
+<h2>{{ .Domain }}</h2>
+<section class="center">
+  {{ if .Status.Available }}
+  <p>{{ .Domain }} is available.</p>
+  {{ else }}
+  <p>{{ .Domain }} is not available.</p>
+  {{ end }}
+  <p>Last checked: {{ .Status.LastSearched.Format "2006-01-02 15:04:05" }}</p>
+  <p><a class="no-decoration" href="/check/{{ .Domain }}">↻ check again</a></p>
+  {{end}}
+</section>
