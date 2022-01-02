@@ -31,20 +31,35 @@ func (r RedisClient) AddDomainToCheck(domain string) error {
 	return r.AddDomainsToCheck([]string{domain})
 }
 
-func (r RedisClient) AddDomainsToCheck(domains []string) error {
+func (r RedisClient) AddDomainsToCheck(domains []string) (err error) {
 	exists, err := r.connection.Exists(ctx, "domains_to_check").Result()
 	if err != nil {
+		return
+	}
+
+	if exists == 1 {
+		existentDomains, err := r.GetDomainsToCheck()
+		if err != nil {
+			return err
+		}
+		domainsToAdd := make([]string, 0)
+
+		for _, d := range domains {
+			if !utils.StringInSlice(d, existentDomains) {
+				domainsToAdd = append(domainsToAdd, d)
+			}
+		}
+
+		_, err = r.connection.LPush(ctx, "domains_to_check", domainsToAdd).Result()
 		return err
 	}
-	if exists == 1 {
-		r.connection.LPush(ctx, "domains_to_check", domains)
-		return nil
-	}
+
 	_, err = r.connection.LPush(ctx, "domains_to_check", domains).Result()
-	return err
+	return
 }
 
 func (r RedisClient) DeleteDomainToCheck(domain string) error {
+	log.Printf("deleting domain %s\n", domain)
 	domains, err := r.GetDomainsToCheck()
 	if err != nil {
 		return err
@@ -59,7 +74,7 @@ func (r RedisClient) DeleteDomainToCheck(domain string) error {
 			return nil
 		}
 	}
-	return fmt.Errorf("domain \"%s\" not found in list", domain)
+	return fmt.Errorf("domain %s not found", domain)
 }
 
 func (r RedisClient) ClearDomains() error {
@@ -102,6 +117,38 @@ func (r RedisClient) GetDomainStatus(domain string) (status DomainStatus, err er
 		return DomainStatus{}, err
 	}
 	status, err = NewDomainStatusFromHashMap(result)
+	return
+}
+
+func (r RedisClient) DeleteDomainStatus(domain string) (err error) {
+	_, err = r.connection.Del(ctx, fmt.Sprintf("domain_status_%s", domain)).Result()
+	return
+}
+
+func (r RedisClient) RemoveDuplicateDomains() (err error) {
+	log.Println("Removing duplicate domains")
+	domains, err := r.GetDomainsToCheck()
+	if err != nil {
+		return
+	}
+	set := make(map[string]int)
+	for _, d := range domains {
+		set[d] += 1
+	}
+
+	for domain, count := range set {
+		log.Printf("Domain \"%s\" has %d occurences\n", domain, count)
+		if count > 1 {
+			log.Printf("Deleting duplicate domain \"%s\"\n", domain)
+			for i := 1; i < count-1; i++ {
+				err = r.DeleteDomainToCheck(domain)
+				if err != nil {
+					return
+				}
+			}
+
+		}
+	}
 	return
 }
 

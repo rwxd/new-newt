@@ -16,22 +16,24 @@ type Index struct {
 func handlerIndex(w http.ResponseWriter, r *http.Request) {
 	domains, err := db.Rdb.GetDomainsToCheck()
 	if err != nil {
-		log.Fatal(w, err)
+		log.Println(w, err)
 		return
 	}
+	log.Printf("Found %d domains to check\n", len(domains))
+
 	index := Index{Domains: make(map[string]db.DomainStatus)}
 	for _, domain := range domains {
 		status, err := db.Rdb.GetDomainStatus(domain)
 		if err != nil {
-			log.Fatal(w, err)
+			log.Println(w, err)
 			continue
 		}
 		index.Domains[domain] = status
 	}
 
-	log.Printf("Found %d domains to check\n", len(domains))
+	log.Printf("found %d domain status\n", len(index.Domains))
 
-	t, err := template.ParseFiles("./ui/templates/index.html")
+	t, err := template.ParseFiles("./web/templates/index.html")
 	if err != nil {
 		log.Println(err)
 	}

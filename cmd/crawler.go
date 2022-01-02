@@ -71,6 +71,11 @@ var crawlerCmd = &cobra.Command{
 					<-guard // release guard
 				}(domain)
 			}
+			wg.Wait()
+			err = db.Rdb.RemoveDuplicateDomains()
+			if err != nil {
+				log.Fatal(err)
+			}
 			time.Sleep(60 * time.Second)
 		}
 	},

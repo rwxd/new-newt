@@ -27,10 +27,13 @@ services:
 
   new-newt-web:
     build:
+      context: ./
       dockerfile: Dockerfile
     command: web
     env_file:
       - ./.env
+    ports:
+      - 8080:8080
     depends_on:
       - redis
 

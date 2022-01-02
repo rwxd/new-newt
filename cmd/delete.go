@@ -25,6 +25,11 @@ var deleteCmd = &cobra.Command{
 				if err != nil {
 					log.Println("Error adding domain to list:", err)
 				}
+
+				err = db.Rdb.DeleteDomainStatus(arg)
+				if err != nil {
+					log.Println("Error removing domain status:", err)
+				}
 			} else {
 				log.Printf("\"%s\" is not in the list of domains to check\n", arg)
 			}

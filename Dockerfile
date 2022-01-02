@@ -6,10 +6,6 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" .
 
-FROM golang:1.17-bullseye
-
-WORKDIR /app
-
-COPY --from=builder /app/new-newt /usr/bin/
+RUN cp /app/new-newt /usr/bin/
 
 ENTRYPOINT ["new-newt"]
