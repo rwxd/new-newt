@@ -83,8 +83,10 @@ docker-compose exec new-newt-crawler clear
 ### Make Targets
 
 ```bash
-❯ make
+build                          Build the binary file
 build-docker                   build docker image
+clean                          Remove previous build
+dep                            get the dependencies
 run-docker                     run project
 test                           test go code
 ```
