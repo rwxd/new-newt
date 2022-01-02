@@ -139,7 +139,6 @@ func (r RedisClient) RemoveDuplicateDomains() (err error) {
 	}
 
 	for domain, count := range set {
-		log.Printf("Domain \"%s\" has %d occurences\n", domain, count)
 		if count > 1 {
 			log.Printf("Deleting duplicate domain \"%s\"\n", domain)
 			for i := 1; i < count-1; i++ {

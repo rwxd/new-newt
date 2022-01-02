@@ -9,13 +9,14 @@ import (
 
 func WebServer(port string, config utils.Config) {
 	log.Println("Serving Web Server on port ", port)
-	http.HandleFunc("/", handlerHome)
-	http.HandleFunc("/check/", handlerCheck)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", handlerHome)
+	mux.HandleFunc(("/check/"), handlerCheck)
 
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
-	http.Handle("/static/", http.StripPrefix("/static/", fileServer))
+	mux.Handle("/static/", http.StripPrefix("/static/", fileServer))
 
-	err := http.ListenAndServe(":"+port, nil)
+	err := http.ListenAndServe(":"+port, mux)
 	if err != nil {
 		log.Fatal("Error starting web server: ", err)
 	}

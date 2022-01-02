@@ -12,6 +12,9 @@
     </header>
     <nav>
       <a href="/">Home</a>
+      <form action="/add/" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Add domain" />
     </nav>
     <section>{{template "body" .}}</section>
     {{template "footer" .}}
