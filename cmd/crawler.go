@@ -14,18 +14,25 @@ var crawlerCmd = &cobra.Command{
 	Use:   "crawler",
 	Short: "runs the crawler in an infinity loop",
 	Run: func(cmd *cobra.Command, args []string) {
+		interval, _ := cmd.Flags().GetInt("interval")
+		checkInterval := time.Duration(interval) * time.Minute
+		concurrent, _ := cmd.Flags().GetInt("concurrent")
+
 		log.Println("Starting the application...")
+		log.Println("Check interval:", checkInterval)
+		log.Println("Concurrent checks:", concurrent)
+
 		whoisClient := whois.NewWhoisClient()
 		var wg sync.WaitGroup
-		maxGoroutines := 1
-		guard := make(chan struct{}, maxGoroutines)
-
-		checkInterval := time.Minute * 60 * 24
+		guard := make(chan struct{}, concurrent)
 
 		for {
 			domains, err := db.Rdb.GetDomainsToCheck()
 			if err != nil {
 				log.Fatal(err)
+			}
+			if len(domains) == 0 {
+				log.Println("No domains to check")
 			}
 			for _, domain := range domains {
 				guard <- struct{}{} // would block if guard channel is already filled
@@ -67,4 +74,9 @@ var crawlerCmd = &cobra.Command{
 			time.Sleep(60 * time.Second)
 		}
 	},
+}
+
+func init() {
+	crawlerCmd.Flags().IntP("interval", "i", 60, "interval between checks in minutes")
+	crawlerCmd.Flags().IntP("concurrent", "c", 10, "number of concurrent checks")
 }

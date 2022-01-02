@@ -7,8 +7,21 @@ services:
     ports:
       - 6379:6379
 
-  new-newt:
-    image: new-newt
+  new-newt-crawler:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    command: crawler
+    env_file:
+      - ./.env
+    depends_on:
+      - redis
+
+  new-newt-web:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    command: web
     env_file:
       - ./.env
     depends_on:

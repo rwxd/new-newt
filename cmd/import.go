@@ -31,7 +31,9 @@ var importFileCmd = &cobra.Command{
 			domains_to_add := make([]string, 0)
 			for _, line := range lines {
 				fmt.Printf("Adding \"%s\" to the list of domains to check\n", line)
-				domains_to_add = append(domains_to_add, strings.ToLower(line))
+				if line != "" {
+					domains_to_add = append(domains_to_add, strings.ToLower(line))
+				}
 			}
 			err = db.Rdb.AddDomainsToCheck(domains_to_add)
 			if err != nil {

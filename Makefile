@@ -4,8 +4,9 @@ help:
 build-docker: ## build docker image
 	docker build -t new-newt .
 
-run-docker: build-docker ## run docker image
-	docker-compose up -d --force-recreate && docker-compose logs -f
+run-docker: build-docker ## run project
+	docker-compose up -d
+	docker-compose logs -f
 
 test: ## test go code
 	go test -race ./...

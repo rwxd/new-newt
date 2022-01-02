@@ -1,11 +1,15 @@
-FROM golang:1.17-alpine
+FROM golang:1.17-bullseye as builder
 
 WORKDIR /app
 
 COPY . .
 
-RUN go get -d -v ./...
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" .
 
-RUN go build -v cmd/main.go
+FROM golang:1.17-bullseye
 
-CMD ["./main"]
+WORKDIR /app
+
+COPY --from=builder /app/new-newt /usr/bin/
+
+ENTRYPOINT ["new-newt"]
