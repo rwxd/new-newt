@@ -1,0 +1,16 @@
+<h1>New-Newt Domain Availability Checker</h1>
+<br />
+<table>
+  <tr>
+    <th>Domain</th>
+    <th>Available</th>
+    <th>Last Checked</th>
+  </tr>
+  {{ range $domain, $status := .Domains }}
+  <tr>
+    <td>{{ $domain }}</td>
+    <td>{{ $status.Available }}</td>
+    <td>{{ $status.LastSearched.Format "2006-01-02 15:04:05" }}</td>
+  </tr>
+  {{ end }}
+</table>

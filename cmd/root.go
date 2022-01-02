@@ -25,7 +25,8 @@ func Execute() {
 func init() {
 	rootCmd.AddCommand(addCmd)
 	rootCmd.AddCommand(deleteCmd)
-	rootCmd.AddCommand(serverCmd)
+	rootCmd.AddCommand(crawlerCmd)
+	rootCmd.AddCommand(webCmd)
 	rootCmd.AddCommand(showCmd)
 	rootCmd.AddCommand(clearCmd)
 	rootCmd.AddCommand(importCmd)

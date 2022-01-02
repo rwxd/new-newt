@@ -11,9 +11,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var serverCmd = &cobra.Command{
-	Use:   "server",
-	Short: "serve the server",
+var crawlerCmd = &cobra.Command{
+	Use:   "crawler",
+	Short: "runs the crawler in an infinity loop",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Println("Starting the application...")
 		config, err := utils.LoadConfig(".")
