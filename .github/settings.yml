@@ -1,0 +1,10 @@
+---
+# These settings are synced to GitHub by https://probot.github.io/apps/settings/
+
+_extends: gh-templates:.github/common-settings.yml
+
+repository:
+  name: "new-newt"
+  description: "Domain Availability Checker"
+  homepage: "https://rwxd.github.io/new-newt/"
+  topics: "go, domain, availability, redis, whois"
