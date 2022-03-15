@@ -5,6 +5,6 @@ _extends: gh-templates:.github/common-settings.yml
 
 repository:
   name: "new-newt"
-  description: "Domain Availability Checker"
+  description: "Domain Availability Checker with Redis Backend."
   homepage: "https://rwxd.github.io/new-newt/"
   topics: "go, domain, availability, redis, whois"
